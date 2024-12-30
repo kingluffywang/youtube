@@ -1,4 +1,5 @@
 # 导入所需的库
+import argparse
 import subprocess  # 用于执行外部命令
 import os  # 用于文件和目录操作
 
@@ -44,7 +45,11 @@ def resize_video_for_youtube_shorts(input_file, output_file):
        # 捕获并打印 FFmpeg 执行过程中的错误
        print(f"调整视频大小时出错: {e}")
 
-# 使用示例
-input_video = "input.mp4"    # 输入视频文件路径
-output_video = "output.mp4"  # 输出视频文件路径
-resize_video_for_youtube_shorts(input_video, output_video)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Resize video for YouTube Shorts format")
+    parser.add_argument("-i", "--input", required=True, help="输入视频文件路径")
+    parser.add_argument("-o", "--output", required=True, help="输出视频文件路径")
+
+    args = parser.parse_args()
+
+    resize_video_for_youtube_shorts(args.input, args.output)

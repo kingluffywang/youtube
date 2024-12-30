@@ -1,3 +1,4 @@
+import argparse
 from faster_whisper import WhisperModel
 from pydub import AudioSegment
 import numpy as np
@@ -44,10 +45,14 @@ def transcribe_audio(audio_file_path, output_file_path, language="zh"):
 
     return transcription
 
-# 使用示例
-audio_file = "文件地址.mp3"  # 替换为你的 mp3 文件路径
-output_file = "文件地址.txt"  # 替换为你的输出文本文件路径
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Transcribe MP3 audio files to text.")
+    parser.add_argument("-i", "--input", required=True, help="Path to the MP3 audio file.")
+    parser.add_argument("-o", "--output", required=True, help="Path to save the transcribed text.")
+    parser.add_argument("--lang", default="zh", help="Language of the audio (default: zh).")
 
-result = transcribe_audio(audio_file, output_file, language="zh")
-print(f"转录结果已保存到: {output_file}")
-print("转录结果的前500个字符:", result[:500])
+    args = parser.parse_args()
+
+    result = transcribe_audio(args.input, args.output, language=args.lang)
+    print(f"转录结果已保存到: {args.output}")
+    print("转录结果的前500个字符:", result[:500])

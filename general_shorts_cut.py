@@ -1,4 +1,5 @@
 # 导入所需的库
+import argparse
 from moviepy.editor import VideoFileClip  # 导入视频处理库
 import os  # 导入操作系统接口库
 
@@ -50,9 +51,17 @@ def split_video(input_video_path, output_folder):
     # 打印完成信息
     print(f"视频分割完成。共生成 {num_clips} 个片段。")
 
-# 使用示例
-input_video = "sample_video.mp4"  # 输入视频文件路径
-output_folder = "video_shorts_clips"  # 输出文件夹路径
 
-# 调用函数进行视频分割
-split_video(input_video, output_folder)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='将视频分割成59秒的片段')
+    parser.add_argument('-i', '--input', required=True,
+                        help='输入视频文件路径')
+    parser.add_argument('-o', '--output-dir', required=True,
+                        help='输出文件夹路径')
+    
+    # 解析命令行参数
+    args = parser.parse_args()
+    
+    # 调用函数进行视频分割
+    split_video(args.input, args.output_dir)

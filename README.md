@@ -14,51 +14,28 @@ YouTube video processing scripts
 6. 提供详细的处理进度和时间统计
 
 **安装步骤：**
-1. 首先确保安装了 Python（推荐 3.8 或更高版本）
+1. 首先确保安装了 Docker
 
-2. 创建并激活虚拟环境（推荐）：
+2. 镜像构建运行环境
+
 ```bash
-# 创建虚拟环境
-python -m venv venv
-
-# 激活虚拟环境
-# Windows:
-venv\Scripts\activate
-# Linux/Mac:
-source venv/bin/activate
+docker build -t youtubeenv .
 ```
-3. 安装所需依赖：
-```bash
-# 安装基础依赖
-pip install faster-whisper
-pip install pydub
-pip install numpy
 
-# 如果处理 MP3 文件，还需要安装 ffmpeg
-# Windows: 
-# 下载 ffmpeg: https://www.gyan.dev/ffmpeg/builds/
-# 添加到系统环境变量
-
-# Linux:
-sudo apt-get install ffmpeg
-
-# Mac:
-brew install ffmpeg
-```
 **使用示例：**
-```python
-# 导入函数
-from your_script import transcribe_audio
 
-# 调用函数进行转录
-result = transcribe_audio(
-    audio_file_path="你的音频文件.mp3",
-    output_file_path="输出文本.txt",
-    language="zh"  # 支持的语言代码，如 zh=中文, en=英文
-)
+将需要处理的音频文件放置到脚本目录
+
+```bash
+# 导入函数
+docker run -v $(pwd):/data --workdir /data youtubeenv CN_mp3_audio2text.py -i 你的音频文件.mp3 -o 输出文本.txt
 ```
+
+可选参数
+* --lang # 支持的语言代码，如 zh=中文, en=英文，默认 "zh"
+
 **注意事项：**
-1. 代码使用 CPU 进行计算（`device="cpu"`），如果有 GPU 可以修改为 `device="cuda"`
+1. 代码使用 CPU 进行计算（`device="cpu"`），如果有 GPU 可以修改为 `device="cuda"`，同时运行 `docker run` 注意时传递 `--gpus` 指定 GPU 卡数
 2. 使用了 `large-v2` 模型，需要较大内存，如果内存不足可以换用较小的模型
 3. 使用了 `int8` 量化（`compute_type="int8"`）来减少内存占用
 4. 程序会显示详细的处理进度，方便监控长音频的转录进度
@@ -77,51 +54,22 @@ result = transcribe_audio(
 
 **安装步骤：**
 
-1. 确保安装了 Python（推荐 3.8 或更高版本）
+1. 首先确保安装了 Docker
 
-2. 创建并激活虚拟环境（推荐）：
+2. 镜像构建运行环境
+
 ```bash
-# 创建虚拟环境
-python -m venv venv
-
-# 激活虚拟环境
-# Windows:
-venv\Scripts\activate
-# Linux/Mac:
-source venv/bin/activate
-```
-
-3. 安装所需依赖：
-```bash
-# 安装基础依赖
-pip install faster-whisper
-pip install pydub
-pip install numpy
-
-# 安装 ffmpeg（处理音频文件必需）
-# Windows: 
-# 1. 下载 ffmpeg: https://www.gyan.dev/ffmpeg/builds/
-# 2. 解压并添加到系统环境变量
-
-# Linux:
-sudo apt-get install ffmpeg
-
-# Mac:
-brew install ffmpeg
+docker build -t youtubeenv .
 ```
 
 **使用示例：**
-```python
-# 导入函数
-from your_script import transcribe_audio_to_srt
 
-# 调用函数生成字幕
-result = transcribe_audio_to_srt(
-    audio_file_path="你的音频.mp3",
-    output_srt_path="输出字幕.srt",
-    language="zh"  # 支持的语言代码，如 zh=中文, en=英文
-)
+```bash
+docker run -v $(pwd):/data --workdir /data youtubeenv zimu.py -i 你的音频.mp3 -o 输出字幕.srt
 ```
+
+可选参数
+* --lang # 支持的语言代码，如 zh=中文, en=英文，默认 "zh"
 
 **生成的 SRT 格式示例：**
 ```
@@ -135,7 +83,7 @@ result = transcribe_audio_to_srt(
 ```
 
 **注意事项：**
-1. 代码使用 CPU 进行计算，可通过修改 `device="cuda"` 启用 GPU 加速
+1. 代码使用 CPU 进行计算，可通过修改 `device="cuda"` 启用 GPU 加速，同时运行 `docker run` 注意时传递 `--gpus` 指定 GPU 卡数
 2. 使用了 `large-v2` 模型，需要较大内存，可以根据需要选择较小的模型
 3. 使用了 `int8` 量化以减少内存占用
 4. 输出的 SRT 文件采用 UTF-8 编码，兼容大多数播放器
@@ -153,26 +101,12 @@ result = transcribe_audio_to_srt(
 
 **安装步骤：**
 
-1. 确保安装了 Python（推荐 3.6 或更高版本）
+1. 首先确保安装了 Docker
 
-2. 安装 FFmpeg
+2. 镜像构建运行环境
+
 ```bash
-# Windows:
-# 1. 下载 FFmpeg: https://www.gyan.dev/ffmpeg/builds/
-# 2. 解压并将 bin 目录添加到系统环境变量
-
-# Linux:
-sudo apt update
-sudo apt install ffmpeg
-
-# Mac:
-brew install ffmpeg
-```
-
-3. 验证安装
-```bash
-# 在终端/命令行中验证 FFmpeg 是否安装成功
-ffmpeg -version
+docker build -t youtubeenv .
 ```
 
 **使用示例：**
@@ -188,26 +122,14 @@ resize_video_for_youtube_shorts(
 ```
 
 **参数说明：**
-- `input_file`: 输入视频文件路径
-- `output_file`: 输出视频文件路径
+- `-i` 或者 `--input`: 输入视频文件路径
+- `-o` 或者 `--output`: 输出视频文件路径
 - 输出视频尺寸: 1080x1920 像素（适合 YouTube Shorts）
 - 处理方式：
   - 保持原始视频比例
   - 自动添加黑边填充
   - 视频居中显示
   - 保持原始音频质量
-
-**注意事项：**
-1. 确保系统已正确安装 FFmpeg 并添加到环境变量
-2. 输入视频可以是任何 FFmpeg 支持的格式
-3. 如果输出目录不存在，程序会自动创建
-4. 代码会保持原始音频流（`-c:a copy`），这样可以加快处理速度
-5. 如果转换过程出错，会打印详细的错误信息
-
-**可能的报错处理：**
-- 如果遇到 "FFmpeg not found" 错误，请检查 FFmpeg 是否正确安装并添加到环境变量
-- 如果遇到权限错误，请确保对输出目录有写入权限
-- 如果输入文件不存在，会提示相应的错误信息
 
 脚本 4： helper_srt_spacerm.py
 让我来总结这个字幕处理工具的功能和使用方法。
@@ -265,8 +187,6 @@ remove_spaces_newlines(
 
 输出文件内容：
 这是第一行内容这是第二行内容这是第三行
-```
-
 脚本5：general_shorts_cut.py
 # Video Splitter
 
@@ -281,64 +201,31 @@ remove_spaces_newlines(
 - 显示处理进度
 - 自动对输出文件进行编号
 
-## 环境要求
-
-- Python 3.6+
-- moviepy
-- ffmpeg
-
 ## 安装步骤
 
-1. 首先确保您的系统已安装Python 3.6或更高版本。
+1. 首先确保安装了 Docker
 
-2. 安装必要的Python包：
+2. 镜像构建运行环境
+
 ```bash
-pip install moviepy
-```
-
-3. 安装ffmpeg（moviepy的依赖）：
-
-   - Windows用户：
-     ```bash
-     # 使用Chocolatey包管理器
-     choco install ffmpeg
-     ```
-   
-   - Mac用户：
-     ```bash
-     # 使用Homebrew包管理器
-     brew install ffmpeg
-     ```
-   
-   - Linux用户：
-     ```bash
-     # Ubuntu/Debian
-     sudo apt-get install ffmpeg
-     
-     # CentOS
-     sudo yum install ffmpeg
-     ```
-
-4. 下载项目文件：
-```bash
-git clone [你的项目地址]
-cd video-splitter
+docker build -t youtubeenv .
 ```
 
 ## 使用方法
 
-1. 打开`split_video.py`文件，修改以下参数：
-```python
-input_video = "你的视频文件路径.mp4"  # 修改为您的输入视频路径
-output_folder = "输出文件夹路径"      # 修改为您想要保存分割视频的文件夹路径
-```
-
-2. 运行脚本：
 ```bash
-python split_video.py
+docker run -v $(pwd):/data --workdir /data youtubeenv general_shorts_cut.py -i 你的视频文件路径.mp4 -o /data
 ```
 
-3. 等待处理完成，分割后的视频片段将保存在指定的输出文件夹中。
+等待处理完成，分割后的视频片段将保存在当前目录中。
+
+也可以指定其他目录
+
+```bash
+docker run -v $(pwd):/data -v /other/dir:/other/dir --workdir /data youtubeenv general_shorts_cut.py -i 你的视频文件路径.mp4 -o /other/dir
+```
+
+等待处理完成，分割后的视频片段将保存在目录 /other/dir 中。
 
 ## 输出格式
 
@@ -356,12 +243,6 @@ python split_video.py
 
 ## 常见问题解决
 
-1. 如果遇到ffmpeg相关错误，请确保：
-   - ffmpeg已正确安装
-   - ffmpeg可以在命令行中访问（已添加到系统PATH）
-
-2. 如果出现内存错误，可以尝试：
-   - 关闭其他占用内存的程序
+1. 如果出现内存错误，可以尝试：
    - 处理较小的视频文件
-   - 增加系统的虚拟内存
-
+   - 关闭其他占用内存的程序、增加系统的虚拟内存，然后给容器更多内存 `docker run -m 16Gi ...`

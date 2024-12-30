@@ -1,3 +1,4 @@
+import argparse
 from faster_whisper import WhisperModel
 from pydub import AudioSegment
 import numpy as np
@@ -81,9 +82,13 @@ def transcribe_audio_to_srt(audio_file_path: str, output_srt_path: str, language
 
     return output_srt_path
 
-# 使用示例
 if __name__ == "__main__":
-    audio_file = "文档.mp3"   # 替换为你的音频文件路径
-    output_srt = "文档.srt"   # 替换为你要输出的字幕文件名称
-    result_srt_path = transcribe_audio_to_srt(audio_file, output_srt, language="zh")
+    parser = argparse.ArgumentParser(description="Transcribe audio files to SRT subtitles.")
+    parser.add_argument("-i", "--input", required=True, help="Path to the audio file.")
+    parser.add_argument("-o", "--output", required=True, help="Path to save the SRT subtitles.")
+    parser.add_argument("--lang", default="zh", help="Language of the audio (default: zh).")
+
+    args = parser.parse_args()
+
+    result_srt_path = transcribe_audio_to_srt(args.input, args.output, language=args.lang)
     print(f"转录字幕文件已保存到: {result_srt_path}")
