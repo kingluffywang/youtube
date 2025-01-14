@@ -2,7 +2,99 @@ import gradio as gr
 from scripts.zimu_jianti import transcribe_audio_to_srt
 from scripts.CN_mp3_audio2text import transcribe_audio
 from scripts.helper_srt_spacerm import remove_spaces_newlines
+import subprocess
 import os
+import pkg_resources
+import sys
+import subprocess
+
+def check_requirements():
+    with open('requirements.txt') as f:
+        requirements = f.read().splitlines()
+    
+    for requirement in requirements:
+        try:
+            pkg_resources.require(requirement)
+        except:
+            print(f"Installing {requirement}...")
+            subprocess.check_call([sys.executable, "-m", "pip", "install", requirement])
+
+def resize_video_for_youtube_shorts(input_file, output_file):
+    output_dir = "output"
+    os.makedirs(output_dir, exist_ok=True)
+    output_file = os.path.join(output_dir, os.path.basename(output_file))
+    
+    command = [
+        'ffmpeg',
+        '-i', input_file,
+        '-vf', 'scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2',
+        '-c:a', 'copy',
+        output_file
+    ]
+    
+    try:
+        subprocess.run(command, check=True)
+        return output_file
+    except subprocess.CalledProcessError as e:
+        print(f"Error resizing video: {e}")
+        return None
+
+def split_video(input_video_path):
+    output_folder = "output/shorts_clips"
+    os.makedirs(output_folder, exist_ok=True)
+    
+    duration_cmd = [
+        'ffmpeg',
+        '-i', input_video_path,
+        '-f', 'null',
+        '-'
+    ]
+    
+    result = subprocess.run(duration_cmd, capture_output=True)
+    duration_output = result.stderr.decode()
+    duration_line = [line for line in duration_output.split('\n') if "Duration" in line][0]
+    duration_str = duration_line.split("Duration: ")[1].split(",")[0]
+    h, m, s = map(float, duration_str.split(':'))
+    total_seconds = h * 3600 + m * 60 + s
+    
+    num_clips = int(total_seconds // 59) + (1 if total_seconds % 59 > 0 else 0)
+    output_files = []
+    
+    for i in range(num_clips):
+        start_time = i * 59
+        output_filename = f"clip_{i+1:03d}.mp4"
+        output_path = os.path.join(output_folder, output_filename)
+        
+        split_cmd = [
+            'ffmpeg',
+            '-i', input_video_path,
+            '-ss', str(start_time),
+            '-t', '59',
+            '-c', 'copy',
+            output_path
+        ]
+        
+        subprocess.run(split_cmd, check=True)
+        output_files.append(output_path)
+    
+    return output_files
+
+def process_resize(video):
+    if video is None:
+        return None
+    input_path = video.name if hasattr(video, 'name') else video
+    output_dir = "output"
+    os.makedirs(output_dir, exist_ok=True)
+    output_filename = os.path.join(output_dir, os.path.basename(input_path).replace(".mp4", "_shorts.mp4"))
+    return resize_video_for_youtube_shorts(input_path, output_filename)
+
+def process_split(video):
+    if video is None:
+        return None
+    input_path = video.name if hasattr(video, 'name') else video
+    output_dir = "output/shorts_clips"
+    os.makedirs(output_dir, exist_ok=True)
+    return split_video(input_path)
 
 def process_audio_srt(audio_file, language, chinese_conversion):
     if audio_file is None:
@@ -75,8 +167,8 @@ def process_srt_spaces(input_srt):
         return f"Error processing SRT: {str(e)}"
 
 def create_ui():
-    with gr.Blocks(title="Audio & Subtitle Processing Tool") as app:
-        gr.Markdown("# Audio & Subtitle Processing Tool")
+    with gr.Blocks(title="Audio, Subtitle & Video Processing Tool") as app:
+        gr.Markdown("# Audio, Subtitle & Video Processing Tool")
         
         with gr.Tabs():
             with gr.Tab("Subtitle Generator (SRT)"):
@@ -93,7 +185,7 @@ def create_ui():
                             value="To Simplified",
                             label="Chinese Character Conversion"
                         )
-                        srt_submit_btn = gr.Button("Generate Subtitles")
+                        srt_submit_btn = gr.Button("Generate Subtitles", variant="primary")
                     
                     with gr.Column():
                         srt_output = gr.TextArea(label="Generated Subtitles (SRT format)", lines=10)
@@ -107,7 +199,7 @@ def create_ui():
                             value="zh",
                             label="Select Language"
                         )
-                        text_submit_btn = gr.Button("Transcribe to Text")
+                        text_submit_btn = gr.Button("Transcribe to Text", variant="primary")
                     
                     with gr.Column():
                         text_output = gr.TextArea(label="Transcribed Text", lines=10)
@@ -119,13 +211,32 @@ def create_ui():
                             label="Upload SRT File",
                             file_types=[".srt"]
                         )
-                        space_remove_btn = gr.Button("Remove Spaces and Newlines")
+                        space_remove_btn = gr.Button("Remove Spaces and Newlines", variant="primary")
                     
                     with gr.Column():
                         space_remove_output = gr.TextArea(
                             label="Processed SRT Content",
                             lines=10
                         )
+
+            with gr.Tab("YouTube Shorts Converter"):
+                with gr.Row():
+                    with gr.Column():
+                        video_input_resize = gr.File(label="Upload Video")
+                        resize_button = gr.Button("Convert to Shorts Format", variant="primary")
+                    with gr.Column():
+                        resize_output = gr.Video(label="Resized Video")
+                        
+
+            with gr.Tab("Video Splitter"):
+                with gr.Row():
+                    with gr.Column():
+                        video_input_split = gr.File(label="Upload Video")
+                        split_button = gr.Button("Split into 59s Clips", variant="primary")
+                    with gr.Column():
+                        
+                        split_output = gr.File(label="Split Video Clips", file_count="multiple")
+                    
 
         srt_submit_btn.click(
             fn=process_audio_srt,
@@ -144,9 +255,22 @@ def create_ui():
             inputs=[srt_file_input],
             outputs=space_remove_output
         )
-    
+
+        resize_button.click(
+            fn=process_resize,
+            inputs=video_input_resize,
+            outputs=resize_output
+        )
+
+        split_button.click(
+            fn=process_split,
+            inputs=video_input_split,
+            outputs=split_output
+        )
+
     return app
 
 if __name__ == "__main__":
+    check_requirements()  # Add this line before creating the UI
     app = create_ui()
     app.launch()
