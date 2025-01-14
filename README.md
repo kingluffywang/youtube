@@ -58,19 +58,23 @@ WebUI 分为音频处理和视频处理两个部分，分别对应 `webui.py` �
 ```bash
 # 激活虚拟环境
 source venv/bin/activate
+
 # 运行音频处理脚本
 python webui.py
+
 # 运行视频处理脚本
 python webui_video.py
 ```
 
+### 使用说明
 脚本运行后，请开浏览器访问 http://localhost:7860，进入 WebUI 界面。
+输出路径统一在output文件夹下。
 
 
 
-# 原脚本详解（使用WebUI的可略过）：
+## 原脚本详解（使用WebUI的可略过）：
 
-# 脚本 1: CN_mp3_audio2text.py
+## 脚本 1: CN_mp3_audio2text.py
 
 这段代码的功能和安装步骤。
 
@@ -273,7 +277,7 @@ remove_spaces_newlines(
 
 
 
-# 脚本 2-b 音频转字幕工具说明文档：zimu_jianti.py 生成简体字的字幕
+## 脚本 2-b 音频转字幕工具说明文档：zimu_jianti.py 生成简体字的字幕
 
 ## 功能简介
 
@@ -377,9 +381,9 @@ transcribe_audio_to_srt(
 
 
 
-# Video Processing
+## Video Processing
 
-# 脚本 5： video-resize.py
+## 脚本 5： video-resize.py
 
 **代码功能概述：**
 这是一个视频分辨率转换工具，专门用于将普通视频转换为适合 YouTube Shorts 的垂直视频格式（1080x1920）。主要功能：
@@ -448,7 +452,7 @@ resize_video_for_youtube_shorts(
 - 如果输入文件不存在，会提示相应的错误信息
 
 
-# 脚本6 Video Splitter：general_shorts_cut.py 
+## 脚本6 Video Splitter：general_shorts_cut.py 
 
 一个简单但功能强大的视频分割工具，可以将长视频自动分割成59秒的短片段。这个工具特别适合需要将视频内容切分成短视频的场景，比如准备短视频平台的内容。
 
