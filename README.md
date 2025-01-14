@@ -1,6 +1,8 @@
 # youtube
 YouTube video processing scripts
 
+## Update: Gradio interface intragration and auto installation
+
 脚本 1: CN_mp3_audio2text.py
 这段代码的功能和安装步骤。
 
