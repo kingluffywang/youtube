@@ -1,17 +1,7 @@
-import gradio as gr
-from scripts.zimu_jianti import transcribe_audio_to_srt
-from scripts.CN_mp3_audio2text import transcribe_audio
-from scripts.helper_srt_spacerm import remove_spaces_newlines
 import os
+import sys
 import subprocess
 import pkg_resources
-import webbrowser
-
-def open_folder(path):
-    """Opens the folder in file explorer"""
-    if os.path.exists(path):
-        webbrowser.open(os.path.realpath(path))
-    return path
 
 def check_requirements():
     with open('requirements.txt') as f:
@@ -297,6 +287,12 @@ def create_ui():
     return app
 
 if __name__ == "__main__":
-    check_requirements()  # Add this line before creating the UI
+    check_requirements() 
+    
+    import gradio as gr
+    from scripts.zimu_jianti import transcribe_audio_to_srt
+    from scripts.CN_mp3_audio2text import transcribe_audio
+    from scripts.helper_srt_spacerm import remove_spaces_newlines
+
     app = create_ui()
     app.launch()
