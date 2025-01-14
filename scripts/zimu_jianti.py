@@ -27,9 +27,11 @@ def transcribe_audio_to_srt(audio_file_path: str, output_srt_path: str, language
     print(f"开始处理音频文件: {audio_file_path}")
     start_time = time.time()
 
-    # 1) 初始化繁简转换器
+    # Initialize converter based on direction
     if to_simplified:
-        converter = opencc.OpenCC('t2s')  # 繁体转简体
+        converter = opencc.OpenCC('t2s')  # Traditional to Simplified
+    else:
+        converter = opencc.OpenCC('s2t')  # Simplified to Traditional
     
     # 2) 加载 WhisperModel
     print("正在加载Whisper模型...")
