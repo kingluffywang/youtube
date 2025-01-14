@@ -2,11 +2,16 @@ import gradio as gr
 from scripts.zimu_jianti import transcribe_audio_to_srt
 from scripts.CN_mp3_audio2text import transcribe_audio
 from scripts.helper_srt_spacerm import remove_spaces_newlines
-import subprocess
 import os
-import pkg_resources
-import sys
 import subprocess
+import pkg_resources
+import webbrowser
+
+def open_folder(path):
+    """Opens the folder in file explorer"""
+    if os.path.exists(path):
+        webbrowser.open(os.path.realpath(path))
+    return path
 
 def check_requirements():
     with open('requirements.txt') as f:
@@ -83,7 +88,7 @@ def process_resize(video):
     if video is None:
         return None
     input_path = video.name if hasattr(video, 'name') else video
-    output_dir = "output"
+    output_dir = "output/resized_videos"
     os.makedirs(output_dir, exist_ok=True)
     output_filename = os.path.join(output_dir, os.path.basename(input_path).replace(".mp4", "_shorts.mp4"))
     return resize_video_for_youtube_shorts(input_path, output_filename)
@@ -96,7 +101,7 @@ def process_split(video):
     os.makedirs(output_dir, exist_ok=True)
     return split_video(input_path)
 
-def process_audio_srt(audio_file, language, chinese_conversion):
+def process_audio_srt(audio_file, language, chinese_conversion, device):
     if audio_file is None:
         return "Please upload an audio file"
     
@@ -115,7 +120,8 @@ def process_audio_srt(audio_file, language, chinese_conversion):
             audio_file.name, 
             output_path, 
             language=language,
-            to_simplified=to_simplified
+            to_simplified=to_simplified,
+            device=device
         )
         
         with open(output_path, "r", encoding="utf-8") as f:
@@ -126,7 +132,7 @@ def process_audio_srt(audio_file, language, chinese_conversion):
     except Exception as e:
         return f"Error processing audio: {str(e)}"
 
-def process_audio_text(audio_file, language):
+def process_audio_text(audio_file, language, device):
     if audio_file is None:
         return "Please upload an audio file"
     
@@ -139,7 +145,12 @@ def process_audio_text(audio_file, language):
     output_path = os.path.join(output_dir, base_name + ".txt")
     
     try:
-        result = transcribe_audio(audio_file.name, output_path, language=language)
+        result = transcribe_audio(
+            audio_file.name, 
+            output_path, 
+            language=language,
+            device=device
+        )
         return f"Text file saved in: {output_path}\n\n{result}"
     except Exception as e:
         return f"Error processing audio: {str(e)}"
@@ -180,15 +191,22 @@ def create_ui():
                             value="zh",
                             label="Select Language"
                         )
-                        chinese_conversion = gr.Dropdown(
-                            choices=["No Conversion", "To Simplified", "To Traditional"],
-                            value="To Simplified",
-                            label="Chinese Character Conversion"
-                        )
+                        with gr.Row():
+                            srt_device = gr.Radio(
+                                choices=["cpu", "cuda"],
+                                value="cpu",
+                                label="Processing Device"
+                            )
+                            chinese_conversion = gr.Dropdown(
+                                choices=["No Conversion", "To Simplified", "To Traditional"],
+                                value="To Simplified",
+                                label="Chinese Character Conversion"
+                            )
                         srt_submit_btn = gr.Button("Generate Subtitles", variant="primary")
                     
                     with gr.Column():
                         srt_output = gr.TextArea(label="Generated Subtitles (SRT format)", lines=10)
+                        gr.Markdown("Output files will be saved to: `./output/*.srt`")
 
             with gr.Tab("Plain Text Transcription"):
                 with gr.Row():
@@ -199,10 +217,18 @@ def create_ui():
                             value="zh",
                             label="Select Language"
                         )
+                        with gr.Row():
+                            text_device = gr.Radio(
+                                choices=["cpu", "cuda"],
+                                value="cpu",
+                                label="Processing Device"
+                            )
                         text_submit_btn = gr.Button("Transcribe to Text", variant="primary")
                     
                     with gr.Column():
                         text_output = gr.TextArea(label="Transcribed Text", lines=10)
+                        gr.Markdown("Output files will be saved to: `./output/*.txt`")
+                        
 
             with gr.Tab("SRT Space Removal"):
                 with gr.Row():
@@ -218,6 +244,7 @@ def create_ui():
                             label="Processed SRT Content",
                             lines=10
                         )
+                        gr.Markdown("Output files will be saved to: `./output/*_nospaces.srt`")
 
             with gr.Tab("YouTube Shorts Converter"):
                 with gr.Row():
@@ -226,7 +253,7 @@ def create_ui():
                         resize_button = gr.Button("Convert to Shorts Format", variant="primary")
                     with gr.Column():
                         resize_output = gr.Video(label="Resized Video")
-                        
+                        gr.Markdown("Output files will be saved to: `./output/resized_videos/`")                       
 
             with gr.Tab("Video Splitter"):
                 with gr.Row():
@@ -234,19 +261,19 @@ def create_ui():
                         video_input_split = gr.File(label="Upload Video")
                         split_button = gr.Button("Split into 59s Clips", variant="primary")
                     with gr.Column():
-                        
                         split_output = gr.File(label="Split Video Clips", file_count="multiple")
+                        gr.Markdown("Output files will be saved to: `./output/shorts_clips/`")
                     
 
         srt_submit_btn.click(
             fn=process_audio_srt,
-            inputs=[srt_audio_input, srt_language, chinese_conversion],
+            inputs=[srt_audio_input, srt_language, chinese_conversion, srt_device],
             outputs=srt_output
         )
 
         text_submit_btn.click(
             fn=process_audio_text,
-            inputs=[text_audio_input, text_language],
+            inputs=[text_audio_input, text_language, text_device],
             outputs=text_output
         )
 
@@ -267,7 +294,6 @@ def create_ui():
             inputs=video_input_split,
             outputs=split_output
         )
-
     return app
 
 if __name__ == "__main__":

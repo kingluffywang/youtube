@@ -5,9 +5,11 @@ YouTube video processing scripts
 
 集成了Gradio WebUI界面。简化了安装步骤。支持拖拽操作。开箱即用。
 
-1. 首先确保安装了 Python（推荐 3.11.11 或更高版本）
+1. 首先确保安装了 Python（新安装推荐 3.11.11 或更高版本）
 
 2. 确保安装ffmpeg （支持mp3处理）：
+需要手动安装
+
 ```bash
 # Windows: 
 # 下载 ffmpeg: https://www.gyan.dev/ffmpeg/builds/
@@ -19,54 +21,40 @@ sudo apt-get install ffmpeg
 brew install ffmpeg
 ```
 
+3. git clone 本仓库
+
+```bash
+git clone https://... #本仓库地址#
+```
+
 3. 创建并激活虚拟环境（推荐）：
 ```bash
-# 创建虚拟环境
-python -m venv venv
+# 进入项目目录
+cd youtube # 或自定义目录
 
+# 创建虚拟环境
+python3 -m venv venv
+```
+
+### 运行 WebUI
+
+6. 运行脚本：
+
+```bash
 # 激活虚拟环境
 # Windows:
 venv\Scripts\activate
 # Linux/Mac:
 source venv/bin/activate
+
+# 运行脚本
+python3 webui.py
 ```
 
-4. 预安装所需依赖：
-```bash
-# 安装基础依赖
-pip install -r requirements.txt
-```
+### 说明
+windows下可以直接双击start_windows.bat运行。
+linux或者mac下也可以运行webui.sh
 
-5. 安装ffmpeg：
-```bash
-# Windows: 
-# 下载 ffmpeg: https://www.gyan.dev/ffmpeg/builds/
-# 添加到系统环境变量（具体参阅 ffmpeg 安装文档）
-
-# Linux:
-sudo apt-get install ffmpeg
-
-# Mac:
-brew install ffmpeg
-```
-
-### 运行 WebUI
-
-WebUI 分为音频处理和视频处理两个部分，分别对应 `webui.py` 和 `webui_video.py`。
-
-6. 运行脚本：
-```bash
-# 激活虚拟环境
-source venv/bin/activate
-
-# 运行音频处理脚本
-python webui.py
-
-# 运行视频处理脚本
-python webui_video.py
-```
-
-### 使用说明
 脚本运行后，请开浏览器访问 http://localhost:7860，进入 WebUI 界面。
 输出路径统一在output文件夹下。
 
