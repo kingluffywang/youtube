@@ -53,9 +53,11 @@ python3 webui.py
 
 ### 说明
 windows下可以直接双击start_windows.bat运行。
-linux或者mac下也可以运行webui.sh
+linux或者mac下也可以运行start.sh
+`chmod +x your_script.sh` 赋予脚本可执行权限
+`./start.sh`
 
-脚本运行后，请开浏览器访问 http://localhost:7860，进入 WebUI 界面。
+脚本运行后，开浏览器访问 http://localhost:7860，进入 WebUI 界面。
 输出路径统一在output文件夹下。
 
 
