@@ -3,7 +3,75 @@ YouTube video processing scripts
 
 ## Update: Gradio interface intragration and auto installation
 
-脚本 1: CN_mp3_audio2text.py
+集成了Gradio WebUI界面。简化了安装步骤。支持拖拽操作。开箱即用。
+
+1. 首先确保安装了 Python（推荐 3.11.11 或更高版本）
+
+2. 确保安装ffmpeg （支持mp3处理）：
+```bash
+# Windows: 
+# 下载 ffmpeg: https://www.gyan.dev/ffmpeg/builds/
+# 添加到系统环境变量（具体参阅 ffmpeg 安装文档）
+
+# Linux:
+sudo apt-get install ffmpeg
+# Mac:
+brew install ffmpeg
+```
+
+3. 创建并激活虚拟环境（推荐）：
+```bash
+# 创建虚拟环境
+python -m venv venv
+
+# 激活虚拟环境
+# Windows:
+venv\Scripts\activate
+# Linux/Mac:
+source venv/bin/activate
+```
+
+4. 预安装所需依赖：
+```bash
+# 安装基础依赖
+pip install -r requirements.txt
+```
+
+5. 安装ffmpeg：
+```bash
+# Windows: 
+# 下载 ffmpeg: https://www.gyan.dev/ffmpeg/builds/
+# 添加到系统环境变量（具体参阅 ffmpeg 安装文档）
+
+# Linux:
+sudo apt-get install ffmpeg
+
+# Mac:
+brew install ffmpeg
+```
+
+### 运行 WebUI
+
+WebUI 分为音频处理和视频处理两个部分，分别对应 `webui.py` 和 `webui_video.py`。
+
+6. 运行脚本：
+```bash
+# 激活虚拟环境
+source venv/bin/activate
+# 运行音频处理脚本
+python webui.py
+# 运行视频处理脚本
+python webui_video.py
+```
+
+脚本运行后，请开浏览器访问 http://localhost:7860，进入 WebUI 界面。
+
+
+
+# 原脚本详解（使用WebUI的可略过）：
+
+# 脚本 1: CN_mp3_audio2text.py
+
 这段代码的功能和安装步骤。
 
 **代码功能概述：**
@@ -65,7 +133,7 @@ result = transcribe_audio(
 3. 使用了 `int8` 量化（`compute_type="int8"`）来减少内存占用
 4. 程序会显示详细的处理进度，方便监控长音频的转录进度
 
-脚本 2： zimu.py
+## 脚本 2： zimu.py
 我来帮你总结这段代码的功能和安装步骤。
 
 **代码功能概述：**
@@ -143,73 +211,7 @@ result = transcribe_audio_to_srt(
 4. 输出的 SRT 文件采用 UTF-8 编码，兼容大多数播放器
 5. 程序会显示详细的处理进度，方便监控长音频的转录进度
 
-脚本 3： video-resize.py
 
-**代码功能概述：**
-这是一个视频分辨率转换工具，专门用于将普通视频转换为适合 YouTube Shorts 的垂直视频格式（1080x1920）。主要功能：
-1. 自动创建输出目录（如果不存在）
-2. 调整视频分辨率到 1080x1920
-3. 保持原始视频的宽高比
-4. 用黑边填充空白区域（居中处理）
-5. 保持原始音频质量不变
-
-**安装步骤：**
-
-1. 确保安装了 Python（推荐 3.6 或更高版本）
-
-2. 安装 FFmpeg
-```bash
-# Windows:
-# 1. 下载 FFmpeg: https://www.gyan.dev/ffmpeg/builds/
-# 2. 解压并将 bin 目录添加到系统环境变量
-
-# Linux:
-sudo apt update
-sudo apt install ffmpeg
-
-# Mac:
-brew install ffmpeg
-```
-
-3. 验证安装
-```bash
-# 在终端/命令行中验证 FFmpeg 是否安装成功
-ffmpeg -version
-```
-
-**使用示例：**
-```python
-# 导入函数
-from video_converter import resize_video_for_youtube_shorts
-
-# 转换视频
-resize_video_for_youtube_shorts(
-    input_file="原始视频.mp4",
-    output_file="shorts版本.mp4"
-)
-```
-
-**参数说明：**
-- `input_file`: 输入视频文件路径
-- `output_file`: 输出视频文件路径
-- 输出视频尺寸: 1080x1920 像素（适合 YouTube Shorts）
-- 处理方式：
-  - 保持原始视频比例
-  - 自动添加黑边填充
-  - 视频居中显示
-  - 保持原始音频质量
-
-**注意事项：**
-1. 确保系统已正确安装 FFmpeg 并添加到环境变量
-2. 输入视频可以是任何 FFmpeg 支持的格式
-3. 如果输出目录不存在，程序会自动创建
-4. 代码会保持原始音频流（`-c:a copy`），这样可以加快处理速度
-5. 如果转换过程出错，会打印详细的错误信息
-
-**可能的报错处理：**
-- 如果遇到 "FFmpeg not found" 错误，请检查 FFmpeg 是否正确安装并添加到环境变量
-- 如果遇到权限错误，请确保对输出目录有写入权限
-- 如果输入文件不存在，会提示相应的错误信息
 
 脚本 4： helper_srt_spacerm.py
 让我来总结这个字幕处理工具的功能和使用方法。
@@ -269,107 +271,9 @@ remove_spaces_newlines(
 这是第一行内容这是第二行内容这是第三行
 ```
 
-脚本5：general_shorts_cut.py
-# Video Splitter
 
-一个简单但功能强大的视频分割工具，可以将长视频自动分割成59秒的短片段。这个工具特别适合需要将视频内容切分成短视频的场景，比如准备短视频平台的内容。
 
-## 功能特点
-
-- 自动将视频分割成59秒的片段
-- 保持原视频的质量
-- 自动创建输出目录
-- 使用H.264视频编码和AAC音频编码
-- 显示处理进度
-- 自动对输出文件进行编号
-
-## 环境要求
-
-- Python 3.6+
-- moviepy
-- ffmpeg
-
-## 安装步骤
-
-1. 首先确保您的系统已安装Python 3.6或更高版本。
-
-2. 安装必要的Python包：
-```bash
-pip install moviepy
-```
-
-3. 安装ffmpeg（moviepy的依赖）：
-
-   - Windows用户：
-     ```bash
-     # 使用Chocolatey包管理器
-     choco install ffmpeg
-     ```
-   
-   - Mac用户：
-     ```bash
-     # 使用Homebrew包管理器
-     brew install ffmpeg
-     ```
-   
-   - Linux用户：
-     ```bash
-     # Ubuntu/Debian
-     sudo apt-get install ffmpeg
-     
-     # CentOS
-     sudo yum install ffmpeg
-     ```
-
-4. 下载项目文件：
-```bash
-git clone [你的项目地址]
-cd video-splitter
-```
-
-## 使用方法
-
-1. 打开`split_video.py`文件，修改以下参数：
-```python
-input_video = "你的视频文件路径.mp4"  # 修改为您的输入视频路径
-output_folder = "输出文件夹路径"      # 修改为您想要保存分割视频的文件夹路径
-```
-
-2. 运行脚本：
-```bash
-python split_video.py
-```
-
-3. 等待处理完成，分割后的视频片段将保存在指定的输出文件夹中。
-
-## 输出格式
-
-- 输出的视频文件将按照 `clip_001.mp4`, `clip_002.mp4`, ... 的格式命名
-- 每个片段最长59秒
-- 视频编码：H.264
-- 音频编码：AAC
-
-## 注意事项
-
-- 确保有足够的磁盘空间存储分割后的视频片段
-- 处理大型视频文件时可能需要较长时间
-- 建议在处理重要视频前先备份原始文件
-- 确保对输入视频文件和输出目录有正确的读写权限
-
-## 常见问题解决
-
-1. 如果遇到ffmpeg相关错误，请确保：
-   - ffmpeg已正确安装
-   - ffmpeg可以在命令行中访问（已添加到系统PATH）
-
-2. 如果出现内存错误，可以尝试：
-   - 关闭其他占用内存的程序
-   - 处理较小的视频文件
-   - 增加系统的虚拟内存
-
-脚本 6：zimu_jianti.py 生成简体字的字幕
-
-# 音频转字幕工具说明文档
+# 脚本 2-b 音频转字幕工具说明文档：zimu_jianti.py 生成简体字的字幕
 
 ## 功能简介
 
@@ -471,3 +375,172 @@ transcribe_audio_to_srt(
 - 系统是否有足够的存储空间
 - 网络连接是否正常（首次运行需要下载模型）
 
+
+
+# Video Processing
+
+# 脚本 5： video-resize.py
+
+**代码功能概述：**
+这是一个视频分辨率转换工具，专门用于将普通视频转换为适合 YouTube Shorts 的垂直视频格式（1080x1920）。主要功能：
+1. 自动创建输出目录（如果不存在）
+2. 调整视频分辨率到 1080x1920
+3. 保持原始视频的宽高比
+4. 用黑边填充空白区域（居中处理）
+5. 保持原始音频质量不变
+
+**安装步骤：**
+
+1. 确保安装了 Python（推荐 3.6 或更高版本）
+
+2. 安装 FFmpeg
+```bash
+# Windows:
+# 1. 下载 FFmpeg: https://www.gyan.dev/ffmpeg/builds/
+# 2. 解压并将 bin 目录添加到系统环境变量
+
+# Linux:
+sudo apt update
+sudo apt install ffmpeg
+
+# Mac:
+brew install ffmpeg
+```
+
+3. 验证安装
+```bash
+# 在终端/命令行中验证 FFmpeg 是否安装成功
+ffmpeg -version
+```
+
+**使用示例：**
+```python
+# 导入函数
+from video_converter import resize_video_for_youtube_shorts
+
+# 转换视频
+resize_video_for_youtube_shorts(
+    input_file="原始视频.mp4",
+    output_file="shorts版本.mp4"
+)
+```
+
+**参数说明：**
+- `input_file`: 输入视频文件路径
+- `output_file`: 输出视频文件路径
+- 输出视频尺寸: 1080x1920 像素（适合 YouTube Shorts）
+- 处理方式：
+  - 保持原始视频比例
+  - 自动添加黑边填充
+  - 视频居中显示
+  - 保持原始音频质量
+
+**注意事项：**
+1. 确保系统已正确安装 FFmpeg 并添加到环境变量
+2. 输入视频可以是任何 FFmpeg 支持的格式
+3. 如果输出目录不存在，程序会自动创建
+4. 代码会保持原始音频流（`-c:a copy`），这样可以加快处理速度
+5. 如果转换过程出错，会打印详细的错误信息
+
+**可能的报错处理：**
+- 如果遇到 "FFmpeg not found" 错误，请检查 FFmpeg 是否正确安装并添加到环境变量
+- 如果遇到权限错误，请确保对输出目录有写入权限
+- 如果输入文件不存在，会提示相应的错误信息
+
+
+# 脚本6 Video Splitter：general_shorts_cut.py 
+
+一个简单但功能强大的视频分割工具，可以将长视频自动分割成59秒的短片段。这个工具特别适合需要将视频内容切分成短视频的场景，比如准备短视频平台的内容。
+
+## 功能特点
+
+- 自动将视频分割成59秒的片段
+- 保持原视频的质量
+- 自动创建输出目录
+- 使用H.264视频编码和AAC音频编码
+- 显示处理进度
+- 自动对输出文件进行编号
+
+## 环境要求
+
+- Python 3.6+
+- moviepy
+- ffmpeg
+
+## 安装步骤
+
+1. 首先确保您的系统已安装Python 3.6或更高版本。
+
+2. 安装必要的Python包：
+```bash
+pip install moviepy
+```
+
+3. 安装ffmpeg（moviepy的依赖）：
+
+   - Windows用户：
+     ```bash
+     # 使用Chocolatey包管理器
+     choco install ffmpeg
+     ```
+   
+   - Mac用户：
+     ```bash
+     # 使用Homebrew包管理器
+     brew install ffmpeg
+     ```
+   
+   - Linux用户：
+     ```bash
+     # Ubuntu/Debian
+     sudo apt-get install ffmpeg
+     
+     # CentOS
+     sudo yum install ffmpeg
+     ```
+
+4. 下载项目文件：
+```bash
+git clone [你的项目地址]
+cd video-splitter
+```
+
+## 使用方法
+
+1. 打开`split_video.py`文件，修改以下参数：
+```python
+input_video = "你的视频文件路径.mp4"  # 修改为您的输入视频路径
+output_folder = "输出文件夹路径"      # 修改为您想要保存分割视频的文件夹路径
+```
+
+2. 运行脚本：
+```bash
+python split_video.py
+```
+
+3. 等待处理完成，分割后的视频片段将保存在指定的输出文件夹中。
+
+## 输出格式
+
+- 输出的视频文件将按照 `clip_001.mp4`, `clip_002.mp4`, ... 的格式命名
+- 每个片段最长59秒
+- 视频编码：H.264
+- 音频编码：AAC
+
+## 注意事项
+
+- 确保有足够的磁盘空间存储分割后的视频片段
+- 处理大型视频文件时可能需要较长时间
+- 建议在处理重要视频前先备份原始文件
+- 确保对输入视频文件和输出目录有正确的读写权限
+
+## 常见问题解决
+
+1. 如果遇到ffmpeg相关错误，请确保：
+   - ffmpeg已正确安装
+   - ffmpeg可以在命令行中访问（已添加到系统PATH）
+
+2. 如果出现内存错误，可以尝试：
+   - 关闭其他占用内存的程序
+   - 处理较小的视频文件
+   - 增加系统的虚拟内存
