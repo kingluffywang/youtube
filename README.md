@@ -1,24 +1,30 @@
-# youtube
-YouTube video processing scripts
+# YouTube 视频工作流 AI 字幕快速工具
 
-## Update: Gradio interface intragration and auto installation
+## 目录
+- [快速开始](#快速开始)
+- [功能模块](#功能模块)
+  - [音频转文字](#音频转文字)
+  - [字幕生成](#字幕生成)
+  - [视频处理](#视频处理)
+- [详细说明](#详细说明)
 
-集成了Gradio WebUI界面。简化了安装步骤。支持拖拽操作。开箱即用。
+## 快速开始
 
-1. 首先确保安装了 Python（新安装推荐 3.11.11 或更高版本）
+### 环境要求
+- Python 3.8+
+- ffmpeg
 
-2. 确保安装ffmpeg （支持mp3处理）：
-需要手动安装
+### 安装步骤
 
+1. 安装 ffmpeg:
 ```bash
-# Windows: 
-# 下载 ffmpeg: https://www.gyan.dev/ffmpeg/builds/
-# 添加到系统环境变量（具体参阅 ffmpeg 安装文档）
-
 # Linux:
 sudo apt-get install ffmpeg
 # Mac:
 brew install ffmpeg
+# Windows: 
+# 下载 ffmpeg: https://www.gyan.dev/ffmpeg/builds/
+# 添加到系统环境变量（具体参阅 ffmpeg 安装文档，手动步骤较多）
 ```
 
 3. git clone 本仓库
@@ -27,19 +33,33 @@ brew install ffmpeg
 git clone https://... #本仓库地址#
 ```
 
-3. 创建并激活虚拟环境（推荐）：
+3. 创建虚拟环境（推荐）：
 ```bash
-# 进入项目目录
-cd youtube # 或自定义目录
-
+#进入项目目录
+cd youtube 
 # 创建虚拟环境
-python3 -m venv venv
+python3 -m venv venv 
+
+# 激活虚拟环境
+# Linux/Mac:
+source venv/bin/activate
+# Windows:
+venv\Scripts\activate
 ```
 
 ### 运行 WebUI
 
-6. 运行脚本：
+方法1 执行脚本：
 
+Linux/Mac:
+```bash
+chmod +x start.sh # 赋予脚本可执行权限
+./start.sh # 运行脚本
+```
+Windows: 
+双击 start_windows.bat
+
+方法2 手动运行webui：
 ```bash
 # 激活虚拟环境
 # Windows:
@@ -51,20 +71,36 @@ source venv/bin/activate
 python3 webui.py
 ```
 
-### 说明
-windows下可以直接双击start_windows.bat运行。
-linux或者mac下也可以运行start.sh
-`chmod +x your_script.sh` 赋予脚本可执行权限
-`./start.sh`
+脚本运行后，根据提示打开浏览器访问 http://localhost:7860
+注：文件输出路径统一在output文件夹下。
 
-脚本运行后，开浏览器访问 http://localhost:7860，进入 WebUI 界面。
-输出路径统一在output文件夹下。
+### 功能模块
+- 音频转文字 (CN_mp3_audio2text.py)
+ 将 MP3 音频转换为文本
+ 支持中英文识别
+ 使用 Whisper 大型语音识别模型
+- 字幕生成
+ zimu.py
+  生成标准 SRT 格式字幕
+  支持时间戳自动生成
+  支持多语言
+ zimu_jianti.py
+  支持繁体转简体
+  使用 Whisper large-v3 模型
+  更高的识别准确率
+- 视频处理
+ video-resize.py
+  转换视频为 YouTube Shorts 格式 (1080x1920)
+  自动添加黑边
+  保持原始音频质量
+ general_shorts_cut.py
+  自动分割视频为 59 秒片段
+  保持原视频质量
+  自动编号输出文件
 
+## 详细说明：
 
-
-## 原脚本详解（使用WebUI的可略过）：
-
-## 脚本 1: CN_mp3_audio2text.py
+### 脚本 1: CN_mp3_audio2text.py
 
 这段代码的功能和安装步骤。
 
@@ -127,7 +163,7 @@ result = transcribe_audio(
 3. 使用了 `int8` 量化（`compute_type="int8"`）来减少内存占用
 4. 程序会显示详细的处理进度，方便监控长音频的转录进度
 
-## 脚本 2： zimu.py
+### 脚本 2： zimu.py
 我来帮你总结这段代码的功能和安装步骤。
 
 **代码功能概述：**
@@ -267,9 +303,9 @@ remove_spaces_newlines(
 
 
 
-## 脚本 2-b 音频转字幕工具说明文档：zimu_jianti.py 生成简体字的字幕
+### 脚本 2-b 音频转字幕工具说明文档：zimu_jianti.py 生成简体字的字幕
 
-## 功能简介
+### 功能简介
 
 这是一个基于 Faster Whisper 的音频转写工具，可以将音频文件转换为带时间戳的 SRT 格式字幕文件。主要特点：
 
@@ -279,7 +315,7 @@ remove_spaces_newlines(
 - 提供详细的转换进度提示
 - 使用 Whisper large-v3 模型保证准确率
 
-## 环境要求
+### 环境要求
 
 使用前需要安装以下 Python 包：
 
@@ -313,7 +349,7 @@ transcribe_audio_to_srt(
 - `language`：音频语言代码，默认为 "zh"（中文）
 - `to_simplified`：是否将输出转换为简体中文，默认为 True
 
-## 功能详解
+### 功能详解
 
 1. **音频预处理**
    - 自动将音频转换为单声道
@@ -332,7 +368,7 @@ transcribe_audio_to_srt(
    - 支持繁简中文转换
    - 标准 SRT 格式输出
 
-## 输出示例
+### 输出示例
 
 ```
 1
@@ -344,7 +380,7 @@ transcribe_audio_to_srt(
 这是第二句话的内容
 ```
 
-## 进度显示
+### 进度显示
 
 脚本执行过程中会显示详细的进度信息：
 
@@ -353,14 +389,14 @@ transcribe_audio_to_srt(
 - 转录进度和时间戳
 - 总体处理时间统计
 
-## 注意事项
+### 注意事项
 
 1. 首次运行时会自动下载 Whisper 模型，需要稳定的网络连接
 2. 处理长音频文件时可能需要较长时间
 3. 建议使用高质量的音频输入以获得更好的识别效果
 4. 确保系统有足够的存储空间和内存
 
-## 错误处理
+### 错误处理
 
 如果遇到问题，请检查：
 
@@ -371,9 +407,9 @@ transcribe_audio_to_srt(
 
 
 
-## Video Processing
+### Video Processing
 
-## 脚本 5： video-resize.py
+### 脚本 5： video-resize.py
 
 **代码功能概述：**
 这是一个视频分辨率转换工具，专门用于将普通视频转换为适合 YouTube Shorts 的垂直视频格式（1080x1920）。主要功能：
@@ -442,11 +478,11 @@ resize_video_for_youtube_shorts(
 - 如果输入文件不存在，会提示相应的错误信息
 
 
-## 脚本6 Video Splitter：general_shorts_cut.py 
+### 脚本6 Video Splitter：general_shorts_cut.py 
 
 一个简单但功能强大的视频分割工具，可以将长视频自动分割成59秒的短片段。这个工具特别适合需要将视频内容切分成短视频的场景，比如准备短视频平台的内容。
 
-## 功能特点
+### 功能特点
 
 - 自动将视频分割成59秒的片段
 - 保持原视频的质量
@@ -455,13 +491,13 @@ resize_video_for_youtube_shorts(
 - 显示处理进度
 - 自动对输出文件进行编号
 
-## 环境要求
+### 环境要求
 
 - Python 3.6+
 - moviepy
 - ffmpeg
 
-## 安装步骤
+### 安装步骤
 
 1. 首先确保您的系统已安装Python 3.6或更高版本。
 
@@ -499,7 +535,7 @@ git clone [你的项目地址]
 cd video-splitter
 ```
 
-## 使用方法
+### 使用方法
 
 1. 打开`split_video.py`文件，修改以下参数：
 ```python
@@ -514,21 +550,21 @@ python split_video.py
 
 3. 等待处理完成，分割后的视频片段将保存在指定的输出文件夹中。
 
-## 输出格式
+### 输出格式
 
 - 输出的视频文件将按照 `clip_001.mp4`, `clip_002.mp4`, ... 的格式命名
 - 每个片段最长59秒
 - 视频编码：H.264
 - 音频编码：AAC
 
-## 注意事项
+### 注意事项
 
 - 确保有足够的磁盘空间存储分割后的视频片段
 - 处理大型视频文件时可能需要较长时间
 - 建议在处理重要视频前先备份原始文件
 - 确保对输入视频文件和输出目录有正确的读写权限
 
-## 常见问题解决
+### 常见问题解决
 
 1. 如果遇到ffmpeg相关错误，请确保：
    - ffmpeg已正确安装
