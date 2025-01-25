@@ -1,7 +1,7 @@
+import importlib.metadata
 import os
 import sys
 import subprocess
-import pkg_resources
 
 def check_requirements():
     with open('requirements.txt') as f:
@@ -9,8 +9,10 @@ def check_requirements():
     
     for requirement in requirements:
         try:
-            pkg_resources.require(requirement)
-        except:
+            # Using importlib.metadata instead of pkg_resources
+            package_name = requirement.split('==')[0]
+            importlib.metadata.version(package_name)
+        except importlib.metadata.PackageNotFoundError:
             print(f"Installing {requirement}...")
             subprocess.check_call([sys.executable, "-m", "pip", "install", requirement])
 
