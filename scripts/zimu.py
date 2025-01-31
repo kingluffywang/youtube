@@ -83,7 +83,7 @@ def transcribe_audio_to_srt(audio_file_path: str, output_srt_path: str, language
 
 # 使用示例
 if __name__ == "__main__":
-    audio_file = "文档.mp3"   # 替换为你的音频文件路径
-    output_srt = "文档.srt"   # 替换为你要输出的字幕文件名称
+    audio_file = "audio_file.mp3"   # 替换为你的音频文件路径
+    output_srt = audio_file + ".srt"   # 替换为你要输出的字幕文件名称
     result_srt_path = transcribe_audio_to_srt(audio_file, output_srt, language="zh")
     print(f"转录字幕文件已保存到: {result_srt_path}")

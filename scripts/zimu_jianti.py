@@ -15,7 +15,7 @@ def seconds_to_srt_timestamp(seconds: float) -> str:
     millis = int((seconds - int(seconds)) * 1000)
     return f"{hours:02d}:{minutes:02d}:{secs:02d},{millis:03d}"
 
-def transcribe_audio_to_srt(audio_file_path: str, output_srt_path: str, language="zh", to_simplified=True):
+def transcribe_audio_to_srt(audio_file_path: str, output_srt_path: str, language="zh", to_simplified=True, device="cpu"):
     """
     将音频文件转录为带有时间戳的简体中文 SRT 字幕文件。
     
@@ -23,18 +23,20 @@ def transcribe_audio_to_srt(audio_file_path: str, output_srt_path: str, language
     :param output_srt_path: 输出字幕文件路径（.srt）
     :param language: 语言代码（默认为中文 "zh"）
     :param to_simplified: 是否转换为简体中文（默认为 True）
+    :param device: 使用的设备 ("cpu" 或 "cuda")
     """
     print(f"开始处理音频文件: {audio_file_path}")
     start_time = time.time()
 
-    # 1) 初始化繁简转换器
+    # Initialize converter based on direction
     if to_simplified:
-        converter = opencc.OpenCC('t2s')  # 繁体转简体
+        converter = opencc.OpenCC('t2s')
+    else:
+        converter = opencc.OpenCC('s2t')
     
-    # 2) 加载 WhisperModel
+    # 加载 WhisperModel 时使用选择的设备
     print("正在加载Whisper模型...")
-    # 使用 large-v3 模型以获得更好的中文识别效果
-    model = WhisperModel("large-v3", device="cpu", compute_type="int8")
+    model = WhisperModel("large-v3", device=device, compute_type="int8")
     print(f"模型加载完成，用时 {time.time() - start_time:.2f} 秒")
 
     # 3) 加载并预处理音频

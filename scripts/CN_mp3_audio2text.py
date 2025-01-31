@@ -4,13 +4,12 @@ import numpy as np
 import time
 import os
 
-def transcribe_audio(audio_file_path, output_file_path, language="zh"):
+def transcribe_audio(audio_file_path, output_file_path, language="zh", device="cpu"):
     print(f"开始处理音频文件: {audio_file_path}")
     start_time = time.time()
 
-    # 假设输入文件为 MP3 格式
     print("正在加载Whisper模型...")
-    model = WhisperModel("large-v2", device="cpu", compute_type="int8")
+    model = WhisperModel("large-v2", device=device, compute_type="int8")
     print(f"模型加载完成，用时 {time.time() - start_time:.2f} 秒")
 
     print("正在加载音频文件...")
@@ -43,11 +42,10 @@ def transcribe_audio(audio_file_path, output_file_path, language="zh"):
     print(f"全部处理完成，总用时 {total_time:.2f} 秒")
 
     return transcription
-
 # 使用示例
-audio_file = "文件地址.mp3"  # 替换为你的 mp3 文件路径
-output_file = "文件地址.txt"  # 替换为你的输出文本文件路径
+# audio_file = "文件地址.mp3"  # 替换为你的 mp3 文件路径
+# output_file = "文件地址.txt"  # 替换为你的输出文本文件路径
 
-result = transcribe_audio(audio_file, output_file, language="zh")
-print(f"转录结果已保存到: {output_file}")
-print("转录结果的前500个字符:", result[:500])
+# result = transcribe_audio(audio_file, output_file, language="zh")
+# print(f"转录结果已保存到: {output_file}")
+# print("转录结果的前500个字符:", result[:500])

@@ -1,0 +1,56 @@
+
+# Dependencies and virtual environments
+venv/
+env/
+node_modules/
+__pycache__/
+*.py[cod]
+
+# Video files
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.flv
+*.mkv
+
+# Audio files
+*.mp3
+*.wav
+*.m4a
+
+# Project specific
+.env
+config.json
+credentials.json
+client_secrets.json
+oauth2.json
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Logs and databases
+*.log
+*.sqlite
+*.db
+
+# Build and dist directories
+dist/
+build/
+*.egg-info/
+
+
+
+# Temporary files
+tmp/
+temp/
+
+
+
+# Media files
+media_files/*
+output/*
